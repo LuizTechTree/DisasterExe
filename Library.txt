@@ -660,9 +660,9 @@ function OrionLib:MakeWindow(WindowConfig)
             
             ToggleFrame.Name = "ToggleFrame"
             ToggleFrame.Parent = ToggleFrameGui
-            ToggleFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+            ToggleFrame.BackgroundColor3 = Color3.fromRGB(24, 12, 90)
             ToggleFrame.BackgroundTransparency = 0.660
-            ToggleFrame.Position = UDim2.new(0, 0, 0, 0)
+            ToggleFrame.Position = UDim2.new(0, 0, 0.454706937, 0)
             ToggleFrame.Size = UDim2.new(0.0650164187, 0, 0.0888099447, 0)
             ToggleFrame.Font = Enum.Font.SourceSans
             ToggleFrame.Text = "ToggleFrame"

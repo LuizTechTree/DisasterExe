@@ -80,7 +80,7 @@ task.spawn(function()
 	end
 end)
 
-function Dragging(Frame, Parent)
+function MakeDraggable(Frame, Parent)
     Parent = Parent or Frame
     local Dragging = false
     local DragStart

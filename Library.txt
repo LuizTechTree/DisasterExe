@@ -81,35 +81,41 @@ task.spawn(function()
 end)
 
 local function MakeDraggable(DragPoint, Main)
-	pcall(function()
-		local Dragging, DragInput, MousePos, FramePos
-		AddConnection(DragPoint.InputBegan, function(Input)
-			if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-				Dragging = true
-				MousePos = Input.Position
-				FramePos = Main.Position
+    pcall(function()
+        local Dragging, DragInput, MousePos, FramePos
+        local CameraWasFrozen = false
 
-				Input.Changed:Connect(function()
-					if Input.UserInputState == Enum.UserInputState.End then
-						Dragging = false
-					end
-				end)
-			end
-		end)
-		AddConnection(DragPoint.InputChanged, function(Input)
-			if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
-				DragInput = Input
-			end
-		end)
-		AddConnection(UserInputService.InputChanged, function(Input)
-			if Input == DragInput and Dragging then
-				local Delta = Input.Position - MousePos
-				TweenService:Create(Main, TweenInfo.new(0.05, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position  = UDim2.new(FramePos.X.Scale,FramePos.X.Offset + Delta.X, FramePos.Y.Scale, FramePos.Y.Offset + Delta.Y)}):Play()
-				Main.Position  = UDim2.new(FramePos.X.Scale,FramePos.X.Offset + Delta.X, FramePos.Y.Scale, FramePos.Y.Offset + Delta.Y)
-			end
-		end)
-	end)
-end    
+        DragPoint.InputBegan:Connect(function(Input)
+            if (Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch) and not Dragging then
+                Dragging = true
+                MousePos = Input.Position
+                FramePos = Main.Position
+                CameraWasFrozen = not game:GetService("StarterPlayer").CameraMode.CameraMovementAllowed
+                game:GetService("StarterPlayer").CameraMode.CameraMovementAllowed = false
+                Input.Changed:Connect(function()
+                    if Input.UserInputState == Enum.UserInputState.End then
+                        Dragging = false
+                        game:GetService("StarterPlayer").CameraMode.CameraMovementAllowed = CameraWasFrozen
+                    end
+                end)
+            end
+        end)
+
+        DragPoint.InputChanged:Connect(function(Input)
+            if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
+                DragInput = Input
+            end
+        end)
+
+        UserInputService.InputChanged:Connect(function(Input)
+            if Input == DragInput and Dragging then
+                local Delta = Input.Position - MousePos
+                local NewPosition = FramePos + UDim2.new(0, Delta.X, 0, Delta.Y)
+                Main.Position = NewPosition
+            end
+        end)
+    end)
+end
 
 local function Create(Name, Properties, Children)
 	local Object = Instance.new(Name)
@@ -655,10 +661,10 @@ function OrionLib:MakeWindow(WindowConfig)
             ToggleFrame.BackgroundTransparency = 0.660
             ToggleFrame.Position = UDim2.new(0, 0, 0.454706937, 0)
             ToggleFrame.Size = UDim2.new(0.0650164187, 0, 0.0888099447, 0)
-            ToggleFrame.Font = Enum.Font.SourceSans
-            ToggleFrame.Text = "ToggleFrame"
+            ToggleFrame.Font = Enum.Font.Code
+            ToggleFrame.Text = "REOPEN"
             ToggleFrame.TextScaled = true
-            ToggleFrame.TextColor3 = Color3.fromRGB(40, 40, 40)
+            ToggleFrame.TextColor3 = Color3.fromRGB(255, 255, 255)
             ToggleFrame.TextSize = 24.000
             ToggleFrame.TextXAlignment = Enum.TextXAlignment.Left
             ToggleFrame.Active = true
@@ -678,6 +684,15 @@ function OrionLib:MakeWindow(WindowConfig)
                 Content = "Tap Button in middle of left to reopen the interface",
                 Time = 5
             })
+            
+            if not isfile("RemindHold.txt") then -- Reminder Holder.
+                writefile("RemindHold.txt", {})
+                OrionLib:MakeNotification({
+                    Name = "Interface Reminder",
+                    Content = "You can drag the button too.",
+                    Time = 6.5
+                })
+            end
             
             WindowConfig.CloseCallback()
         end

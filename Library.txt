@@ -80,40 +80,37 @@ task.spawn(function()
 	end
 end)
 
-local function MakeDraggable(DragPoint, Main)
-    pcall(function()
-        local Dragging, DragInput, MousePos, FramePos
-        local CameraWasFrozen = false
+function Dragging(Frame, Parent)
+    Parent = Parent or Frame
+    local Dragging = false
+    local DragStart
+    local StartPos
+    
+    local function Update(input)
+        if Dragging then
+            local Delta = (input.Position - DragStart)
+            Parent.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + Delta.X, StartPos.Y.Scale, StartPos.Y.Offset + Delta.Y)
+        end
+    end
 
-        DragPoint.InputBegan:Connect(function(Input)
-            if (Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch) and not Dragging then
-                Dragging = true
-                MousePos = Input.Position
-                FramePos = Main.Position
-                CameraWasFrozen = not game:GetService("StarterPlayer").CameraMode.CameraMovementAllowed
-                game:GetService("StarterPlayer").CameraMode.CameraMovementAllowed = false
-                Input.Changed:Connect(function()
-                    if Input.UserInputState == Enum.UserInputState.End then
-                        Dragging = false
-                        game:GetService("StarterPlayer").CameraMode.CameraMovementAllowed = CameraWasFrozen
-                    end
-                end)
-            end
-        end)
+    Frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            Dragging = true
+            DragStart = input.Position
+            StartPos = Parent.Position
 
-        DragPoint.InputChanged:Connect(function(Input)
-            if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
-                DragInput = Input
-            end
-        end)
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    Dragging = false
+                end
+            end)
+        end
+    end)
 
-        UserInputService.InputChanged:Connect(function(Input)
-            if Input == DragInput and Dragging then
-                local Delta = Input.Position - MousePos
-                local NewPosition = FramePos + UDim2.new(0, Delta.X, 0, Delta.Y)
-                Main.Position = NewPosition
-            end
-        end)
+    Frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            Update(input)
+        end
     end)
 end
 
@@ -684,15 +681,6 @@ function OrionLib:MakeWindow(WindowConfig)
                 Content = "Tap Button in middle of left to reopen the interface",
                 Time = 5
             })
-            
-            if not isfile("RemindHold.txt") then -- Reminder Holder.
-                writefile("RemindHold.txt", {})
-                OrionLib:MakeNotification({
-                    Name = "Interface Reminder",
-                    Content = "You can drag the button too.",
-                    Time = 6.5
-                })
-            end
             
             WindowConfig.CloseCallback()
         end

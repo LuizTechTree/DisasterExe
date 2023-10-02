@@ -642,15 +642,6 @@ function OrionLib:MakeWindow(WindowConfig)
             })
             WindowConfig.CloseCallback()
 		else
-		    MainWindow.Visible = false
-		    UIHidden = true
-		    OrionLib:MakeNotification({
-                Name = "Interface Hidden",
-                Content = "Tap Button In Top Left-Corner to reopen the interface",
-                Time = 5
-            })
-            WindowConfig.CloseCallback()
-            
 		    local ToggleGui = Instance.new("ScreenGui")
             local ToggleFrame = Instance.new("TextButton")
             local Corner = Instance.new("UICorner")
@@ -679,6 +670,16 @@ function OrionLib:MakeWindow(WindowConfig)
             
             Corner.CornerRadius = UDim.new(0, 10) -- Adjust the radius as needed for perfectly edged corners
             Corner.Parent = ToggleFrame
+            
+            MainWindow.Visible = false
+		    UIHidden = true
+		    OrionLib:MakeNotification({
+                Name = "Interface Hidden",
+                Content = "Tap Button In Top Left-Corner to reopen the interface",
+                Time = 5
+            })
+            
+            WindowConfig.CloseCallback()
         end
 	end)
 

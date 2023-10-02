@@ -650,7 +650,7 @@ function OrionLib:MakeWindow(WindowConfig)
             ToggleGui.Parent = game.CoreGui
             
             ToggleFrame.Name = "ToggleFrame"
-            ToggleFrame.Parent = ToggleFrameGui
+            ToggleFrame.Parent = ToggleGui
             ToggleFrame.BackgroundColor3 = Color3.fromRGB(24, 12, 90)
             ToggleFrame.BackgroundTransparency = 0.660
             ToggleFrame.Position = UDim2.new(0, 0, 0.454706937, 0)
@@ -675,7 +675,7 @@ function OrionLib:MakeWindow(WindowConfig)
 		    UIHidden = true
 		    OrionLib:MakeNotification({
                 Name = "Interface Hidden",
-                Content = "Tap Button In Top Left-Corner to reopen the interface",
+                Content = "Tap Button in middle of left to reopen the interface",
                 Time = 5
             })
             
